@@ -70,7 +70,7 @@ s.add(
     nginx.Key('root', '/usr/share/nginx/html'),
     nginx.Key('index', 'index.html'),
     
-    nginx.Location('= /',
+    nginx.Location('/',
         nginx.Key('proxy_pass', 'http://tasks'))
     )
 
