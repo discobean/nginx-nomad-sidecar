@@ -6,12 +6,34 @@ import argparse
 import sys
 import os
 
-
 parser = argparse.ArgumentParser(description='Create nginx upstream configuration, and start nginx')
 parser.add_argument('-c', required=False, help='nginx command to execute', default="nginx -g 'daemon off;'")
 parser.add_argument('-u', required=True, help='Comma delimited upstream task name(s):label(s) to use as upstream, e.g. othertask1:http1,othertask2:http2')
+parser.add_argument('--worker_connections', required=False, help='Number of worker_connections in nginx.conf', default=1024)
+parser.add_argument('--worker_processes', required=False, help='Number of worker_processes in nginx.conf', default=1)
 
 args = parser.parse_args()
+
+# Write out the /etc/nginx/nginx.conf file as a Jinja template
+nginx_file = "/etc/nginx/nginx.conf"
+content = ""
+with open(nginx_file, 'r') as content_file:
+    content = content_file.read()
+
+# process the template
+template = jinja2.Template(content)
+content = template.render(
+    worker_connections=args.worker_connections,
+    worker_processes=args.worker_processes
+)
+
+print content
+
+# write back the file
+f = open(nginx_file, "w")
+f.write(content)
+f.close()
+
 
 # Build the Configuration file
 c = nginx.Conf()
